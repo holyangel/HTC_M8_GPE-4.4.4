@@ -375,6 +375,12 @@ CFLAGS_KERNEL	= -mfpu=neon-vfpv4 \
 ifeq ($(ENABLE_GRAPHITE),true)
 CFLAGS_KERNEL	+= -Ofast -munaligned-access -Wall -Wno-maybe-uninitialized -fgcse-lm -fgcse-sm -fsingle-precision-constant -fforce-addr -fsched-spec-load -mtune=cortex-a15 -mcpu=cortex-a15 -marm -mfpu=neon-vfpv4 -ftree-vectorize -mvectorize-with-neon-quad -funroll-loops -fpredictive-commoning -ffast-math -fgraphite -floop-parallelize-all -ftree-loop-linear -floop-interchange -floop-strip-mine -floop-block -fomit-frame-pointer -fgcse-las -Wmissing-prototypes -Wstrict-prototypes
 endif
+
+CFLAGS_MODULE   = -fno-pic
+AFLAGS_MODULE   =
+LDFLAGS_MODULE  =
+CFLAGS_KERNEL	=
+ symbols
 AFLAGS_KERNEL	=
 CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage
 
