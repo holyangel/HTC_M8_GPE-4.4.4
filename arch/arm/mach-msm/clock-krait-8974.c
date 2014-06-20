@@ -36,6 +36,40 @@
 #include <mach/perflock.h>
 #endif
 
+unsigned long arg_cpu_oc = 0;
+static int arg_vdd_uv = 0;
+
+static int __init cpufreq_read_cpu_oc(char *cpu_oc)
+{
+	unsigned long ui_khz;
+	int err;
+
+	err =  strict_strtoul(cpu_oc, 0, &ui_khz);
+	if (err)
+		arg_cpu_oc = 0;
+
+	arg_cpu_oc = ui_khz;
+	printk("elementalx: cpu_oc=%lu\n", arg_cpu_oc);
+	return 0;
+}
+__setup("cpu_oc=", cpufreq_read_cpu_oc);
+
+
+
+static int __init cpufreq_read_vdd_uv(char *vdd_uv)
+{
+	long arg, err;
+
+	err =  strict_strtol(vdd_uv, 0, &arg);
+	if (err)
+		arg_vdd_uv = 0;
+
+	arg_vdd_uv = arg;
+	printk("elementalx: vdd_uv=%d\n", arg_vdd_uv);
+	return 0;
+}
+__setup("vdd_uv=", cpufreq_read_vdd_uv);
+
 DEFINE_FIXED_DIV_CLK(hfpll_src_clk, 1, NULL);
 DEFINE_FIXED_DIV_CLK(acpu_aux_clk, 2, NULL);
 
@@ -596,6 +630,61 @@ static void krait_update_uv(int *uv, int num, int boost_uv)
 		for (i = 0; i < num; i++)
 			uv[i] += boost_uv;
 	}
+	
+	
+	switch (arg_vdd_uv) {
+
+	case 1:
+		uv[1] -= 15000;
+		break;
+	case 2:
+		uv[1] -= 30000;
+		break;
+	case 3:
+		uv[1] -= 45000;
+		break;
+	}
+}
+
+static void krait_update_freq(unsigned long *freq, int *uv, int *ua, int num, int speed)
+{
+
+	if (speed == 3 && arg_cpu_oc <= 2457600) {
+		printk("elementalx: uv=%d freq=%lu ua=%d\n", uv[num-1], freq[num-1]/1000, ua[num-1]);
+		return;
+	}
+
+	freq[num-1] = arg_cpu_oc*1000;
+
+	switch (arg_cpu_oc) {
+
+	case 2342400:
+		ua[num-1] = 751;
+		uv[num-1] = min(1200000, uv[num-1] + 15000);
+		break;
+	case 2457600:
+		ua[num-1] = 802;
+		uv[num-1] = min(1200000, uv[num-1] + 35000);
+		break;
+	case 2572800:
+		ua[num-1] = 831;
+		uv[num-1] = min(1200000, uv[num-1] + 50000);
+		break;
+	case 2649600:
+		ua[num-1] = 866;
+		uv[num-1] = min(1200000, uv[num-1] + 65000);
+		break;
+	case 2726400:
+		ua[num-1] = 900;
+		uv[num-1] = min(1200000, uv[num-1] + 80000);
+		break;
+	case 2803200:
+		ua[num-1] = 937;
+		uv[num-1] = min(1200000, uv[num-1] + 95000);
+		break;
+	}
+
+	printk("elementalx: uv=%d freq=%lu ua=%d\n", uv[num-1], freq[num-1]/1000, ua[num-1]);
 }
 
 static char table_name[] = "qcom,speedXX-pvsXX-bin-vXX";
@@ -785,6 +874,9 @@ static int clock_krait_8974_driver_probe(struct platform_device *pdev)
 			rows = ret;
 		}
 	}
+
+	if (arg_cpu_oc > 0)
+		krait_update_freq(freq, uv, ua, rows, speed);
 
 	krait_update_uv(uv, rows, pvs ? 25000 : 0);
 
