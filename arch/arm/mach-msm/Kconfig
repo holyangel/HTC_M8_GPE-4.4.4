@@ -3188,8 +3188,3 @@ config HTC_DEBUG_RBCPR_8226
     default n
     bool "HTC RBCPR debug"
 
-config INTELLI_PLUG
-	bool "Enable intelli-plug cpu hotplug driver"
-	default n
-	help
-	  Generic Intelli-plug cpu hotplug driver for ARM SOCs
