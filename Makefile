@@ -195,7 +195,7 @@ export KBUILD_BUILDHOST := $(SUBARCH)
 ARCH		?= $(SUBARCH)
 CROSS_COMPILE	?= $(CONFIG_CROSS_COMPILE:"%"=%)
 ARCH		:= arm
-CROSS_COMPILE	:= /home/android/android/HTC_M8_GPE-4.4.4/linaro-arm-eabi-4.10/bin/arm-eabi-
+CROSS_COMPILE	:= /home/android/android/HTC_M8_GPE-4.4.4/arm-cortex_a15-linux-gnueabihf-linaro_4.9.1-2014.06/bin/arm-cortex_a15-linux-gnueabihf-
 
 # Architecture as present in compile.h
 UTS_MACHINE 	:= $(ARCH)
@@ -380,7 +380,6 @@ CFLAGS_MODULE   = -fno-pic
 AFLAGS_MODULE   =
 LDFLAGS_MODULE  =
 CFLAGS_KERNEL	=
- symbols
 AFLAGS_KERNEL	=
 CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage
 
