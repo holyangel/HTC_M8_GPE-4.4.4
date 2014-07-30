@@ -195,7 +195,7 @@ export KBUILD_BUILDHOST := $(SUBARCH)
 ARCH		?= $(SUBARCH)
 CROSS_COMPILE	?= $(CONFIG_CROSS_COMPILE:"%"=%)
 ARCH		:= arm
-CROSS_COMPILE	:= /home/android/android/HTC_M8_GPE-4.4.4/arm-cortex_a15-linux-gnueabihf-linaro_4.9.1-2014.06/bin/arm-cortex_a15-linux-gnueabihf-
+CROSS_COMPILE	:= /home/android/android/HTC_M8_GPE-4.4.4/arm-cortex_a15-linux-gnueabihf-linaro_4.9.1-2014.07/bin/arm-cortex_a15-linux-gnueabihf-
 
 # Architecture as present in compile.h
 UTS_MACHINE 	:= $(ARCH)
