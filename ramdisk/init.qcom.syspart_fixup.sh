@@ -1,6 +1,5 @@
 #!/system/bin/sh
-# Copyright (c) 2014, Savoca <adeddo27@gmail.com>
-# Copyright (c) 2009-2014, The Linux Foundation. All rights reserved.
+# Copyright (c) 2012, The Linux Foundation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -27,31 +26,54 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-# Disable MPD, enable intelliplug
-if [ -e /sys/module/intelli_plug/parameters/intelli_plug_active ]; then
-	stop mpdecision
-	echo "1" > /sys/module/intelli_plug/parameters/intelli_plug_active
-	echo "[furnace] IntelliPlug enabled" | tee /dev/kmsg
-else
-	echo "[furnace] IntelliPlug not found, using MPDecision" | tee /dev/kmsg
-	start mpdecision
+target="$1"
+serial="$2"
+
+# No path is set up at this point so we have to do it here.
+PATH=/sbin:/system/sbin:/system/bin:/system/xbin
+export PATH
+
+
+# **** WARNING *****
+# This runs in a single-threaded, critical path portion
+# of the Android bootup sequence.  This is to guarantee
+# all necessary system partition fixups are done before
+# the rest of the system starts up.  Run any non-
+# timing critical tasks in a separate process to
+# prevent slowdown at boot.
+
+# Run modem link script
+if [ -f /system/etc/init.qcom.modem_links.sh ]; then
+  /system/bin/sh /system/etc/init.qcom.modem_links.sh
 fi
 
-# Enable powersuspend
-if [ -e /sys/kernel/power_suspend/power_suspend_mode ]; then
-	echo "1" > /sys/kernel/power_suspend/power_suspend_mode
-	echo "[furnace] Powersuspend enabled" | tee /dev/kmsg
-else
-	echo "[furnace] Failed to set powersuspend" | tee /dev/kmsg
+# Run mdm link script
+if [ -f /system/etc/init.qcom.mdm_links.sh ]; then
+  /system/bin/sh /system/etc/init.qcom.mdm_links.sh
 fi
 
-# Set RGB KCAL
-if [ -e /sys/devices/platform/kcal_ctrl.0/kcal ]; then
-	sd_r=255
-	sd_g=255
-	sd_b=255
-	kcal="$sd_r $sd_g $sd_b"
-	echo "$kcal" > /sys/devices/platform/kcal_ctrl.0/kcal
-	echo "1" > /sys/devices/platform/kcal_ctrl.0/kcal_ctrl
-	echo "[furnace] LCD_KCAL: red=[$sd_r], green=[$sd_g], blue=[$sd_b]" | tee /dev/kmsg
+# Run thermal script
+if [ -f /system/etc/init.qcom.thermal_conf.sh ]; then
+  /system/bin/sh /system/etc/init.qcom.thermal_conf.sh
 fi
+
+# Run wifi script
+if [ -f /init.qcom.wifi.sh ]; then
+  if [ -f /system/bin/sh ]; then
+    /system/bin/sh /init.qcom.wifi.sh "$target" "$serial"
+  else
+    /system/bin/sh2 /init.qcom.wifi.sh "$target" "$serial"
+  fi
+fi
+
+# Run the sensor script
+if [ -f /system/etc/init.qcom.sensor.sh ]; then
+  /system/bin/sh /system/etc/init.qcom.sensor.sh
+fi
+
+# Run usf script
+if [ -f /system/etc/usf_settings.sh ]; then
+  /system/bin/sh /system/etc/usf_settings.sh
+fi
+
+

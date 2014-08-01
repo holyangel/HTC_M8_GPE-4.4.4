@@ -1,0 +1,6 @@
+# SkyDragon Extras
+
+service skydragon-sh /system/bin/sh /init.skydragon.sh
+	class late_start
+	user root
+	oneshot

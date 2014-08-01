@@ -1,8 +1,17 @@
 #
 # ADDITIONAL_DEFAULT_PROPERTIES
 #
-ro.adb.secure=1
-ro.secure=1
+ro.secure=0
+ro.adb.secure=0
 ro.allow.mock.location=0
 ro.debuggable=1
+persist.sys.usb.config=mtp
+
+# Set USB configuration at boot
 persist.sys.usb.config=adb
+
+# Enable USB debugging
+persist.service.adb.enable=1
+
+# Disable USB debugging icon on statusbar
+persist.adb.notify=0
